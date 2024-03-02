@@ -1,5 +1,7 @@
 # Datadome Movements Display
+![Preview](./img/preview.png)
 [Live Demo](https://datadome-movements-display.vercel.app/) | [Codepen](https://codepen.io/glizzykingdreko/pen/YzMPxpM) | [Buy me a coffee](https://www.buymeacoffee.com/glizzykingdreko)
+
 ## Table of Contents
 - [Datadome Movements Display](#datadome-movements-display)
   - [Table of Contents](#table-of-contents)
