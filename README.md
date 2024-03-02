@@ -1,5 +1,5 @@
 # Datadome Movements Display
-[Live Demo]() | [Codepen](https://codepen.io/glizzykingdreko/pen/YzMPxpM) | [Buy me a coffee](https://www.buymeacoffee.com/glizzykingdreko)
+[Live Demo](https://datadome-movements-display.vercel.app/) | [Codepen](https://codepen.io/glizzykingdreko/pen/YzMPxpM) | [Buy me a coffee](https://www.buymeacoffee.com/glizzykingdreko)
 ## Table of Contents
 - [Datadome Movements Display](#datadome-movements-display)
   - [Table of Contents](#table-of-contents)
@@ -56,11 +56,11 @@ This will start the server, and you can view the application by navigating to ht
 
 ## Deployment
 
-This application is deployed on Vercel, providing a seamless and scalable hosting solution. To view the live application, visit [Datadome Movements Display on Vercel](#your-vercel-link). The deployment on Vercel ensures that the application is accessible worldwide with minimal latency.
+This application is deployed on Vercel, providing a seamless and scalable hosting solution. To view the live application, visit [Datadome Movements Display on Vercel](https://datadome-movements-display.vercel.app/). The deployment on Vercel ensures that the application is accessible worldwide with minimal latency.
 
 For those interested in deploying their own version or contributing to the project, Vercel offers an intuitive deployment process that integrates directly with your GitHub repository. Simply connect your GitHub account to Vercel and select the repository you wish to deploy.
 
-Additionally, for a quick look at some of the functionalities and code snippets, check out our [CodePen](#your-codepen-link).
+Additionally, for a quick look at some of the functionalities and code snippets, check out our [CodePen](https://codepen.io/glizzykingdreko/pen/YzMPxpM).
 
 ## Contributing
 
