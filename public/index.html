@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datadome Movement Display</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            height: 100%;
+            font-family: 'Courier New', Courier, monospace;
+            color: #0f0;
+            background-color: #121212;
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+        }
+        #controlPanel {
+            width: 40%;
+            height: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: start;
+            background-color: #121212;
+            overflow-y: auto;
+            border-right: 2px solid #0f0;
+        }
+        .controlRow input[type="number"] {
+            text-align: center;
+        }
+        #animationCanvas {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #121212;
+        }
+        canvas {
+            max-height: 95%;
+            max-width: 95%;
+        }
+        textarea, input[type="number"], button {
+            width: calc(50% - 10px);
+            background-color: #121212;
+            border: 1px solid #0f0;
+            color: #0f0;
+            margin: 5px;
+            padding: 10px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        textarea {
+            width: 100%;
+            height: 75%;
+            margin: 0 0 10px 0;
+        }
+        .controlRow {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+        button, input[type="number"] {
+            flex-basis: 48%;
+        }
+        .credit {
+            margin-top: auto; /* Pushes the content to the bottom */
+            font-size: 0.7rem;
+        }
+        .red {
+            color: #f00;
+        }
+        .gray {
+            color: #888;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 660px), (max-height: 560px) {
+            body, html {
+                flex-direction: column; /* Stack elements vertically */
+            }
+
+            #controlPanel, #animationCanvas {
+                flex-basis: auto; /* Adjust based on content size */
+                width: 100%; /* Full width for small screens */
+                height: 100%; /* Auto-adjust height */
+                border-right: none; /* Remove right border */
+                border-bottom: 2px solid #0f0; /* Add bottom border for separation */
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div id="controlPanel">
+        <textarea id="dataInput" rows="6" placeholder="Paste your movement data here..."></textarea>
+        <div class="controlRow">
+            <button id="playPauseBtn">Play</button>
+            <button id="replayBtn">Replay</button>
+        </div>
+        <div class="controlRow">
+            <input type="number" id="originalWidth" placeholder="Width Original">
+            <input type="number" id="originalHeight" placeholder="Height Original">
+        </div>
+    <p class="credit"><span class="gray">Made with</span> <span class="red">❤️</span> <span class="gray">by</span> <a href="https://github.com/glizzykingdreko" target="_blank" style="color: #0f0;">glizzykingdreko</a></p>
+</div>
+<div id="animationCanvas">
+    <canvas id="movementCanvas"></canvas>
+</div>
+
+<script>
+    let movements = [];
+    const canvas = document.getElementById('movementCanvas');
+    const ctx = canvas.getContext('2d');
+    const originalWidthInput = document.getElementById('originalWidth');
+    const originalHeightInput = document.getElementById('originalHeight');
+    const replayBtn = document.getElementById('replayBtn');
+    const dataInput = document.getElementById('dataInput');
+    let isPaused = false;
+
+    // Load stored dimensions or use default values
+    originalWidthInput.value = localStorage.getItem('originalWidth') || '1920';
+    originalHeightInput.value = localStorage.getItem('originalHeight') || '1055';
+
+    function adjustCanvasSize() {
+        const container = document.getElementById('animationCanvas');
+        canvas.width = container.offsetWidth;
+        canvas.height = container.offsetHeight;
+    }
+
+    function scaleAndCenter(point) {
+        const originalWidth = parseFloat(originalWidthInput.value);
+        const originalHeight = parseFloat(originalHeightInput.value);
+        const xScale = canvas.width / originalWidth;
+        const yScale = canvas.height / originalHeight;
+        const scale = Math.min(xScale, yScale);
+        const offsetX = (canvas.width - originalWidth * scale) / 2;
+        const offsetY = (canvas.height - originalHeight * scale) / 2;
+        const scaledX = point.x * scale + offsetX;
+        const scaledY = point.y * scale + offsetY;
+        return { x: scaledX, y: scaledY };
+    }
+
+    function drawMovement(index = 0) {
+        if (isPaused) return;
+        if (index === 0) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.strokeStyle = '#ff0';
+        }
+
+        if (index < movements.length) {
+            const point = scaleAndCenter(movements[index]);
+            if (index === 0) {
+                ctx.moveTo(point.x, point.y);
+            } else {
+                ctx.lineTo(point.x, point.y);
+            }
+            ctx.stroke();
+            requestAnimationFrame(() => drawMovement(index + 1));
+        }
+    }
+
+    document.getElementById('dataInput').addEventListener('input', function() {
+        movements = JSON.parse(this.value || '[]');
+        localStorage.setItem('movements', JSON.stringify(movements));
+        updateUrlWithEncodedData();
+        drawMovement();
+    });
+
+    playPauseBtn.addEventListener('click', function() {
+        isPaused = !isPaused;
+        this.textContent = isPaused ? 'Play' : 'Pause';
+        if (!isPaused) drawMovement();
+    });
+
+
+    ['originalWidth', 'originalHeight'].forEach(id => {
+        document.getElementById(id).addEventListener('input', function() {
+            localStorage.setItem(this.id, this.value);
+        });
+    });
+
+
+    // Function to update the URL with encoded data
+    function updateUrlWithEncodedData() {
+        const movementsData = document.getElementById('dataInput').value;
+        const originalWidth = document.getElementById('originalWidth').value;
+        const originalHeight = document.getElementById('originalHeight').value;
+        
+        const dataObject = { movements: movementsData, width: originalWidth, height: originalHeight };
+        const encodedData = btoa(encodeURIComponent(JSON.stringify(dataObject)));
+        
+        window.history.replaceState(null, null, `?data=${encodedData}`);
+    }
+
+    function loadDataFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const data = urlParams.get('data');
+        if (data) {
+            const decodedData = JSON.parse(decodeURIComponent(atob(data)));
+            dataInput.value = decodedData.movements;
+            originalWidthInput.value = decodedData.width;
+            originalHeightInput.value = decodedData.height;
+            movements = JSON.parse(decodedData.movements);
+            drawMovement();
+        } else {
+            // Fallback to localStorage or default data
+            const storedMovements = localStorage.getItem('movements');
+            if (storedMovements) {
+                movements = JSON.parse(storedMovements);
+            } else {
+                // Default data or instructions
+                movements = [{"x":744,"y":157,"ts":5225},{"x":746,"y":173,"ts":5244.666666666667},{"x":748,"y":188,"ts":5264.333333333333},{"x":749,"y":203,"ts":5284},{"x":751,"y":217,"ts":5303.666666666667},{"x":753,"y":229,"ts":5323.333333333333},{"x":755,"y":241,"ts":5343},{"x":756,"y":251,"ts":5362.666666666667},{"x":758,"y":261,"ts":5382.333333333333},{"x":760,"y":268,"ts":5402},{"x":762,"y":275,"ts":5421.666666666667},{"x":764,"y":280,"ts":5441.333333333333},{"x":765,"y":283,"ts":5461},{"x":767,"y":286,"ts":5480.666666666667},{"x":769,"y":287,"ts":5500.333333333333},{"x":771,"y":287,"ts":5520},{"x":773,"y":287,"ts":5539.666666666667},{"x":774,"y":286,"ts":5559.333333333333},{"x":776,"y":285,"ts":5579},{"x":778,"y":283,"ts":5598.666666666667},{"x":780,"y":282,"ts":5618.333333333333},{"x":781,"y":280,"ts":5638},{"x":783,"y":279,"ts":5657.666666666667},{"x":785,"y":279,"ts":5677.333333333333},{"x":787,"y":279,"ts":5697},{"x":789,"y":281,"ts":5716.666666666667},{"x":790,"y":283,"ts":5736.333333333333},{"x":792,"y":286,"ts":5756},{"x":794,"y":291,"ts":5775.666666666667},{"x":796,"y":296,"ts":5795.333333333333},{"x":798,"y":303,"ts":5815},{"x":799,"y":311,"ts":5834.666666666667},{"x":801,"y":320,"ts":5854.333333333333},{"x":803,"y":330,"ts":5874},{"x":805,"y":340,"ts":5893.666666666667},{"x":806,"y":351,"ts":5913.333333333333},{"x":808,"y":363,"ts":5933},{"x":810,"y":375,"ts":5952.666666666667},{"x":812,"y":387,"ts":5972.333333333333},{"x":814,"y":400,"ts":5992},{"x":815,"y":412,"ts":6011.666666666667},{"x":817,"y":424,"ts":6031.333333333333},{"x":819,"y":435,"ts":6051},{"x":821,"y":446,"ts":6070.666666666667},{"x":822,"y":456,"ts":6090.333333333333},{"x":824,"y":466,"ts":6110},{"x":826,"y":475,"ts":6129.666666666667},{"x":828,"y":483,"ts":6149.333333333333},{"x":830,"y":490,"ts":6169},{"x":831,"y":497,"ts":6188.666666666667},{"x":833,"y":503,"ts":6208.333333333333},{"x":835,"y":508,"ts":6228},{"x":837,"y":513,"ts":6247.666666666667},{"x":839,"y":518,"ts":6267.333333333334},{"x":840,"y":522,"ts":6287},{"x":842,"y":527,"ts":6306.666666666667},{"x":844,"y":531,"ts":6326.333333333334},{"x":846,"y":536,"ts":6346},{"x":847,"y":541,"ts":6365.666666666667},{"x":849,"y":546,"ts":6385.333333333334},{"x":851,"y":552,"ts":6405}]
+            }
+            dataInput.value = JSON.stringify(movements, null, 4);
+            drawMovement();
+        }
+    }
+
+    window.addEventListener('resize', adjustCanvasSize);
+    adjustCanvasSize();
+    window.onload = loadDataFromUrl;
+
+
+</script>
+
+</body>
+</html>

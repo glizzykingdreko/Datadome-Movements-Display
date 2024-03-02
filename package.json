@@ -1,0 +1,15 @@
+{
+  "name": "datadome-movements-display",
+  "version": "1.0.0",
+  "description": "Interactive visualization tool for Datadome movement data, designed to decode and display user interactions with GeeTest Slide captchas. Features include responsive design, shareable URLs via Base64 encoding, and data persistence for enhanced analysis and collaboration. Deployed on Vercel for easy access.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.3"
+  }
+}
