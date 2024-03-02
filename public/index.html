@@ -204,10 +204,10 @@
         const data = urlParams.get('data');
         if (data) {
             const decodedData = JSON.parse(decodeURIComponent(atob(data)));
-            dataInput.value = decodedData.movements;
+            dataInput.value = typeof decodedData.movements === 'string' ? decodedData.movements : JSON.stringify(decodedData.movements, null, 4);
             originalWidthInput.value = decodedData.width;
             originalHeightInput.value = decodedData.height;
-            movements = JSON.parse(decodedData.movements);
+            movements = typeof decodedData.movements === 'string' ? JSON.parse(decodedData.movements) : decodedData.movements;
             drawMovement();
         } else {
             // Fallback to localStorage or default data
